@@ -6,6 +6,9 @@ function TechDiversityRace() {
   // Each visualisation must have a unique ID with no special
   // characters.
   this.id = 'tech-diversity-race';
+  
+  // List of data sources to be used in visualisation
+  this.sources = [];
 
   // Property to represent whether data has been loaded.
   this.loaded = false;
@@ -15,7 +18,7 @@ function TechDiversityRace() {
   this.preload = function() {
     var self = this;
     this.data = loadTable(
-      './data/tech-diversity/race-2018.csv', 'csv', 'header',
+      this.sources[0], 'csv', 'header',
       // Callback function to set the value
       // this.loaded to true.
       function(table) {

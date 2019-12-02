@@ -4,7 +4,6 @@ function Gallery() {
   this.selectedVisual = null;
   var self = this;
 
-
   // Add a new visualisation to the navigation bar.
   this.addVisual = function(vis) {
 
@@ -20,52 +19,18 @@ function Gallery() {
 
     this.visuals.push(vis);
       
-  
-    // Create menu item.
-    var menuItem = createElement('li', vis.name);
-    menuItem.addClass('menu-item');
-    menuItem.id(vis.id);
-      
-    menuItem.mouseOver(function(e)
-    {
-        
-        var el = select('#' + e.srcElement.id);
-        el.addClass("hover");
-    });
-      
-    menuItem.mouseOut(function(e)
-    {
-        var el = select('#' + e.srcElement.id);
-        el.removeClass("hover");
-    });
-
-    menuItem.mouseClicked(function(e)
-    {
-        //remove selected class from any other menu-items
-        
-        var menuItems = selectAll('.menu-item');
-        
-        for(var i = 0; i < menuItems.length; i++)
-        {
-            menuItems[i].removeClass('selected');
-        }
-        
-        var el = select('#' + e.srcElement.id);
-        el.addClass('selected');
-        
-        self.selectVisual(e.srcElement.id);
-        
-        
-    });
+    this.addToMenu('#visuals-menu', vis.name, vis.id);
     
-    var visMenu = select('#visuals-menu');
-    visMenu.child(menuItem);
-
+  };
+  
+  //Add data sources to a visualisation
+  this.addSource = function(vis, data) {
+    vis.sources.push(data);
+    
     // Preload data if necessary.
     if (vis.hasOwnProperty('preload')) {
       vis.preload();
     }
-    
   };
 
   this.findVisIndex = function(visId) {
@@ -96,10 +61,49 @@ function Gallery() {
       if (this.selectedVisual.hasOwnProperty('setup')) {
         this.selectedVisual.setup();
       }
+      
+      this.addToMenu('#sources-menu', this.visuals[visIndex].sources[0], 1);
 
       // Enable animation in case it has been paused by the current
       // visualisation.
       loop();
     }
+  };
+  
+  this.addToMenu = function(menu, item, id) {
+    // Create menu item.
+    var menuItem = createElement('li', item);
+    menuItem.addClass('menu-item');
+    menuItem.id(id);
+      
+    menuItem.mouseOver(function(e)
+    {
+        var el = select('#' + e.srcElement.id);
+        el.addClass("hover");
+    });
+      
+    menuItem.mouseOut(function(e)
+    {
+        var el = select('#' + e.srcElement.id);
+        el.removeClass("hover");
+    });
+
+    menuItem.mouseClicked(function(e)
+    {
+        //remove selected class from any other menu-items
+        var menuItems = selectAll('.menu-item');
+        
+        for(var i = 0; i < menuItems.length; i++)
+        {
+            menuItems[i].removeClass('selected');
+        }
+        
+        var el = select('#' + e.srcElement.id);
+        el.addClass('selected');
+        self.selectVisual(e.srcElement.id);    
+    });
+    
+    var visMenu = select(menu);
+    visMenu.child(menuItem);
   };
 }

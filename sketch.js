@@ -3,6 +3,8 @@
 // a container for all the visualisations.
 var gallery;
 
+var data = [['race-2018', 'attitudes']];
+
 function setup() {
   // Create a canvas to fill the content div from index.html.
   canvasContainer = select('#app');
@@ -18,6 +20,8 @@ function setup() {
   gallery.addVisual(new PayGapByJob2017());
   gallery.addVisual(new PayGapTimeSeries());
   gallery.addVisual(new ClimateChange());
+  
+  gallery.addSource(gallery.visuals[0], './data/tech-diversity-race/'+ data[0][1] +'.csv');
 }
 
 function draw() {

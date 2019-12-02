@@ -26,9 +26,9 @@ function PieChart(x, y, diameter) {
       return array.length == data.length;
     })) {
       alert(`Data (length: ${data.length})
-Labels (length: ${labels.length})
-Colours (length: ${colours.length})
-Arrays must be the same length!`);
+      Labels (length: ${labels.length})
+      Colours (length: ${colours.length})
+      Arrays must be the same length!`);
     }
 
     // https://p5js.org/examples/form-pie-chart.html
