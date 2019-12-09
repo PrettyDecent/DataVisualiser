@@ -17,8 +17,9 @@ function TechDiversityRace() {
   // gallery when a visualisation is added.
   this.preload = function() {
     var self = this;
+    this.source = this.sources[0];
     this.data = loadTable(
-      this.sources[0], 'csv', 'header',
+      this.source.location, 'csv', 'header',
       // Callback function to set the value
       // this.loaded to true.
       function(table) {
@@ -36,7 +37,7 @@ function TechDiversityRace() {
     this.select = createSelect();
 
     // Set select position.
-    this.select.position(530, 40);
+    this.select.position(530, 60);
 
     // Fill the options with all company names.
     for (var i = 1; i < this.data.getColumnCount(); i++) {
@@ -60,10 +61,12 @@ function TechDiversityRace() {
     // Get the value of the company we're interested in from the
     // select item.
     // Use a temporary hard-code example for now.
-    var companyName = this.select.value();
+    var variantName = this.select.value();
 
     // Get the column of raw data for companyName.
-    var col = this.data.getColumn(companyName);
+    var col = this.data.getColumn(variantName);
+    
+    //console.log(col);
 
     // Convert all data strings to numbers.
     col = stringsToNumbers(col);
@@ -72,12 +75,20 @@ function TechDiversityRace() {
     var labels = this.data.getColumn(0);
 
     // Colour to use for each category.
-    var colours = ['blue', 'red', 'green', 'pink', 'purple', 'yellow'];
+    var colours = this.colourGen(col.length);
 
     // Make a title.
-    var title = 'Employee diversity at ' + companyName;
+    var title = this.source.name;
 
     // Draw the pie chart!
     this.pie.draw(col, labels, colours, title);
+  };
+  
+  this.colourGen = function(colourNum) {
+    var colours = ['blue', 'red', 'green', 'pink', 'purple', 'yellow', 'brown', 'darkblue', 'darkgreen', 'darkred'];
+    do {
+      colours.pop();
+    } while (colourNum < colours.length);
+    return colours;
   };
 }

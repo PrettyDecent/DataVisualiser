@@ -1,7 +1,22 @@
 function Gallery() {
 
+  visMenu = new menu('#visuals-menu');
+  srcMenu = new menu('#sources-menu');
+  
+  this.addVisual = function(vis) {
+    visMenu.addItem(vis);
+  };
+  
+  this.addSource = function(vis, source) {
+    vis.sources.push(source);
+  };
+  
+  visMenu.loadMenu();
+  /*
+  
   this.visuals = [];
   this.selectedVisual = null;
+  this.selectedSource = null;
   var self = this;
 
   // Add a new visualisation to the navigation bar.
@@ -18,16 +33,18 @@ function Gallery() {
     }
 
     this.visuals.push(vis);
-      
     this.addToMenu('#visuals-menu', vis.name, vis.id);
-    
   };
   
   //Add data sources to a visualisation
   this.addSource = function(vis, data) {
     vis.sources.push(data);
+    //Remove this line and add to where the vis is selected in a for loop to add all sources
+    //In the vis deselect section make sure to depopulate the menu as well
+    this.addToMenu('#sources-menu', data.name, data.id);
     
     // Preload data if necessary.
+    //Move this line to when source is selected
     if (vis.hasOwnProperty('preload')) {
       vis.preload();
     }
@@ -54,6 +71,7 @@ function Gallery() {
       if (this.selectedVisual != null && this.selectedVisual.hasOwnProperty('destroy')) {
         this.selectedVisual.destroy();
       }
+      //visIndex / sourceIndex
       // Select the visualisation in the gallery.
       this.selectedVisual = this.visuals[visIndex];
 
@@ -61,15 +79,13 @@ function Gallery() {
       if (this.selectedVisual.hasOwnProperty('setup')) {
         this.selectedVisual.setup();
       }
-      
-      this.addToMenu('#sources-menu', this.visuals[visIndex].sources[0], 1);
 
       // Enable animation in case it has been paused by the current
       // visualisation.
       loop();
     }
   };
-  
+
   this.addToMenu = function(menu, item, id) {
     // Create menu item.
     var menuItem = createElement('li', item);
@@ -106,4 +122,5 @@ function Gallery() {
     var visMenu = select(menu);
     visMenu.child(menuItem);
   };
+  */
 }
