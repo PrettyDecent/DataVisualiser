@@ -21,7 +21,19 @@ function menu(menuId) {
       if (this.selected.hasOwnProperty('setup')) {
         this.selected.setup();
       }
-
+			
+			if (this.selected.hasOwnProperty('sources')) {
+				srcMenu.clearMenu();
+        srcMenu.items = this.items[index].sources;
+				srcMenu.loadMenu();
+      }
+			
+			if (this.selected.hasOwnProperty('location')) {
+				visMenu.selected.sourceIndex = index;
+				visMenu.selected.destroy();
+				visMenu.selected.setup();
+      }
+			
       // Enable animation in case it has been paused by the current
       // visualisation.
       loop();
@@ -61,10 +73,14 @@ function menu(menuId) {
     }
 
     this.items.push(item);
-		
-		// For loop?
-    //this.addToMenu('#visuals-menu', item.name, item.id);
   };
+	
+	this.clearMenu = function() {
+		menuItems = select(this.menuId).child();
+		for (x = menuItems.length-1; x > 0; x--) {
+			menuItems[x].remove();
+		}
+	};
 
   this.loadMenu = function() {
     // Create menu item.
@@ -91,9 +107,7 @@ function menu(menuId) {
 					var menuItems = selectAll('.menu-item');
 					
 					for(var i = 0; i < menuItems.length; i++)
-					{
-							menuItems[i].removeClass('selected');
-					}
+					{ menuItems[i].removeClass('selected'); }
 					
 					var el = select('#' + e.srcElement.id);
 					el.addClass('selected');
