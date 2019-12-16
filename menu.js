@@ -85,10 +85,11 @@ function menu(menuId) {
   this.loadMenu = function() {
     // Create menu item.
 		for (x = 0; x < this.items.length; x++) {
-			var menuItem = createElement('li', this.items[x].name);
-			menuItem.addClass('menu-item');
+			var menuItem = createElement('a', this.items[x].name);
+			/*
+			menuItem.addClass('menu-item');*/
 			menuItem.id(this.items[x].id);
-				
+			/*
 			menuItem.mouseOver(function(e)
 			{
 					var el = select('#' + e.srcElement.id);
@@ -100,17 +101,18 @@ function menu(menuId) {
 					var el = select('#' + e.srcElement.id);
 					el.removeClass("hover");
 			});
-	
+			*/
 			menuItem.mouseClicked(function(e)
 			{
 					//remove selected class from any other menu-items
-					var menuItems = selectAll('.menu-item');
+					/*var menuItems = selectAll('.menu-item');
 					
 					for(var i = 0; i < menuItems.length; i++)
 					{ menuItems[i].removeClass('selected'); }
 					
 					var el = select('#' + e.srcElement.id);
-					el.addClass('selected');
+					/*el.addClass('selected');
+					*/
 					self.selectItem(e.srcElement.id);    
 			});
 			

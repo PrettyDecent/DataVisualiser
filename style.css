@@ -1,5 +1,6 @@
 body{
-    font-family: sans-serif
+    font-family: sans-serif;
+    margin: 0px;
 }
 
 .menu-item {
@@ -21,3 +22,64 @@ body{
 .selected{
     background: gold
 }
+
+/* Code copied from https://www.w3schools.com/howto/howto_css_dropdown.asp */
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  background-color: black;
+  /*position: absolute;*/
+  position: relative;
+  display: inline-block;
+  height: 100px;
+}
+
+#drop-visual {
+  width: 60%;
+}
+
+#drop-source {
+  width: 40%;
+}
+
+ /* Dropdown Button */
+.dropbtn {
+  position: absolute;
+  background-color: #3e7ee6;
+  font-size: 16px;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 95px;
+  border: none;
+  height: 100%;
+  width: 100%;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  top: 100px;
+  position: relative;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd;}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {display: block;}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {background-color: #3265b8;} 

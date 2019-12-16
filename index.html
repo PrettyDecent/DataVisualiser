@@ -32,12 +32,25 @@
     <script src="require.js"></script>
   </head>
   <body>
-    <div id="app" class="container">
-      <ul id="visuals-menu"></ul>
+    <!-- Container for the navigation bar -->
+    <div class="container">
+      <!-- Selection bar for the visuals -->
+      <div class="dropdown" id="drop-visual">
+        <a class="dropbtn">Selected</a>
+        <div class="dropdown-content" id="visuals-menu">
+        </div>
+      </div>
+      
+      <!-- Selection bar for the sources -->
+      <div class="dropdown" id="drop-source">
+        <a class="dropbtn">Selected</a>
+        <div class="dropdown-content" id="sources-menu">
+        </div>
+      </div>
     </div>
+
+    <!-- Container for the visual to appear -->
     <div id="app" class="container">
-      <ul id="sources-menu">
-      </ul>
     </div>
   </body>
 </html>
