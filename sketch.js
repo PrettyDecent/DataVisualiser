@@ -3,21 +3,6 @@
 var visMenu;
 var srcMenu;
 
-var test = "Fail";
-
-function testCallback() {
-  console.log(test);
-}
-
-function testFunc(val, callback) {
-  setTimeout(function(){ test = "Pass"; }, 2000);
-  callback();
-}
-
-testFunc(1, function() {
-  console.log(test);
-});
-
 function setup() {
   // Create a canvas to fill the content div from index.html.
   var cHeight = document.getElementById('app').clientHeight;
@@ -33,13 +18,9 @@ function setup() {
     visMenu.addItem(vis);
   };
   
-  this.addSource = function(vis, source, callback) {
-    if (source.errorCheck()) {
-      vis.sources.push(source);
-    }
-    
+  this.addSource = function(vis, source) {
+    vis.sources.push(source);
   };
-
   
   this.addVisual(new PieChart());
   this.addVisual(new SplitBarChart());
@@ -48,7 +29,6 @@ function setup() {
   this.addVisual(new LineGraphGradient());
   
   this.addSource(visMenu.items[0], new dataSource('employee-diversity', 'Employee diversity in large companies', './data/pie-chart/race-2018.csv'), this.sourceLoaded);
-  console.log("Two");
   this.addSource(visMenu.items[0], new dataSource('food-sourcing', 'British attitudes to food sourcing', './data/pie-chart/attitudes.csv'), this.sourceLoaded); 
  
   this.addSource(visMenu.items[1], new dataSource('gender-diversity-companies', 'Gender diversity in large companies', './data/split-bar-chart/gender-2018.csv'), this.sourceLoaded);
@@ -57,7 +37,7 @@ function setup() {
   
   this.addSource(visMenu.items[2], new dataSource('pay-gap-by-job', 'Pay diversity in large companies', './data/scatter-graph/occupation-hourly-pay-by-gender-2017.csv'), this.sourceLoaded);
   this.addSource(visMenu.items[2], new dataSource('uk-temp-by-weather', 'UK Temperature by weather', './data/scatter-graph/uk-mean-temp-by-weather.csv'), this.sourceLoaded);
-  this.addSource(visMenu.items[2], new dataSource('test', 'TEST', './data/scatter-graph/test.csv'));
+  this.addSource(visMenu.items[2], new dataSource('error-test', 'TEST', './data/scatter-graph/error-test.csv'));
   
   this.addSource(visMenu.items[3], new dataSource('pay-gap-97-17', 'Gender pay gap 1997-2017', './data/line-graph/all-employees-hourly-pay-by-gender-1997-2017.csv', "%"), this.sourceLoaded);
   this.addSource(visMenu.items[3], new dataSource('energy-expenditure', 'UK Energy Expenditure 1970-2018', './data/line-graph/uk-energy-expenditure-1970-2018.csv', "£"), this.sourceLoaded);
@@ -68,8 +48,6 @@ function setup() {
   // Name and file id can be the same, the location within the data file can be specified by the vismenu id
   
   visMenu.loadMenu();
-  
-  
 }
 
 function draw() {

@@ -72,7 +72,7 @@ function menu(menuId) {
     if (this.findIndex(item.id) != null) {
       alert(`Vis '${item.name}' has a duplicate id: '${item.id}'`);
     }
-
+		
     this.items.push(item);
   };
 	
@@ -93,6 +93,13 @@ function menu(menuId) {
 		
 		// Add menu items to the menu.
 		for (x = 0; x < this.items.length; x++) {
+			// Only if item is loaded
+			// Error prevention (In Progress)
+			if (this.items[x].hasOwnProperty('loaded')) {
+				if (!this.items[x].loaded) {
+					continue;
+				}
+			}
 			// Create menu item
 			var menuItem = createElement('a', this.items[x].name);
 			menuItem.id(this.items[x].id);

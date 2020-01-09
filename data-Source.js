@@ -12,28 +12,24 @@ function dataSource(id, name, location, units) {
 	}
 	
 	this.errorAlert = function(error) {
-		//alert(error);
+		alert(error);
 		return;
 	};
-	
-	this.errorCheck = function() {
-		if (this.data.getColumnCount() < 2 || this.data.getRowCount() < 3) {
-			// Returns name of problematic file
-			//this.errorAlert("Not enough data to display in file: "+ self.id +".csv");
-			return false;
-		} else {
-			// Confirms file is loaded with no errors
-			return true;
-		}
-	};
-	
-	this.loadToTable = function(callback) {
+
+	this.loadToTable = function() {
 	  var self = this;
 	  this.data = loadTable(
 			this.location, 'csv', 'header',
 			// Callback function for successful load
 			function(table) {
-				self.loaded = true;
+				// Checks for lack of data
+				if (table.getColumnCount() < 2 || table.getRowCount() < 3) {
+					// Returns name of problematic file
+					self.errorAlert("Not enough data to display in file: "+ self.id +".csv");
+				} else {
+					// Confirms file is loaded with no errors
+					self.loaded = true;
+				}
 			},
 			// Callback function for error
 			function(error) {
