@@ -1,55 +1,95 @@
-function PieChart(x, y, diameter) {
+function PieChart() {
 
-  this.x = x;
-  this.y = y;
-  this.diameter = diameter;
-  this.labelSpace = 30;
-
-  this.get_radians = function(data) {
-    var total = sum(data);
-    var radians = [];
-
-    for (let i = 0; i < data.length; i++) {
-      radians.push((data[i] / total) * TWO_PI);
+  // Name for the visualisation to appear in the menu bar.
+  this.name = 'Pie-Chart';
+  
+  //Unique ID
+  this.id = 'pie-chart';
+  
+  // List of data sources to be used in visualisation
+  this.sources = [];
+  this.sourceIndex = 0;
+ 
+  this.layout = {
+    x: width * 0.5,
+    y: height * 0.55,
+    diameter: width * 0.38,
+    labelSpace: 30,
+    selectX: 200,
+    selectY: 200,
+    
+    posUpdate: function() {
+      this.x = width * 0.5;
+      this.diameter = width * 0.38;
+    }
+  };
+  
+  this.setup = function() {
+    
+    this.source = this.sources[this.sourceIndex];
+    
+    if (!this.source.loaded) {
+      console.log('Data not yet loaded');
+      return;
     }
 
-    return radians;
+    // Create a select DOM element.
+    this.select = createSelect();
+
+    // Fill the select object with the options names.
+    for (var i = 1; i < this.source.data.getColumnCount(); i++) {
+      this.select.option(this.source.data.columns[i]);
+    } 
   };
 
-  this.draw = function(data, labels, colours, title) {
+  this.destroy = function() {
+    this.select.remove();
+  };
 
-    // Test that data is not empty and that each input array is the
-    // same length.
-    if (data.length == 0) {
-      alert('Data has length zero!');
-    } else if (![labels, colours].every((array) => {
-      return array.length == data.length;
-    })) {
-      alert(`Data (length: ${data.length})
-      Labels (length: ${labels.length})
-      Colours (length: ${colours.length})
-      Arrays must be the same length!`);
+  this.draw = function() {
+    if (!this.source.loaded) {
+      console.log('Data not yet loaded');
+      return;
     }
+    
+    // Get the current option from the select item.
+    var variantName = this.select.value();
 
+    // Get the column of raw data for the currently selected item.
+    var col = this.source.data.getColumn(variantName);
+
+    // Convert all data strings to numbers.
+    col = stringsToNumbers(col);
+
+    // Copy the row labels from the table (the first item of each row).
+    var labels = this.source.data.getColumn(0);
+
+    // Colour to use for each category.
+    var colours = colourGen(col.length);
+
+    // Make a title.
+    var title = this.source.name;
     // https://p5js.org/examples/form-pie-chart.html
+    
+    this.select.position(this.layout.x + 50 + this.layout.diameter / 2, this.layout.selectY + 500 - this.layout.diameter / 3);
 
-    var angles = this.get_radians(data);
+    var angles = this.get_radians(col);
     var lastAngle = 0;
     var colour;
 
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < labels.length; i++) {
       if (colours) {
         colour = colours[i];
       } else {
-        colour = map(i, 0, data.length, 0, 255);
+        colour = map(i, 0, labels.length, 0, 255);
       }
 
       fill(colour);
       stroke(0);
       strokeWeight(1);
 
-      arc(this.x, this.y,
-          this.diameter, this.diameter,
+      arc(this.layout.x, this.layout.y,
+          this.layout.diameter, this.layout.diameter,
           lastAngle, lastAngle + angles[i] + 0.001); // Hack for 0!
 
       if (labels) {
@@ -63,15 +103,28 @@ function PieChart(x, y, diameter) {
       noStroke();
       textAlign('center', 'center');
       textSize(24);
-      text(title, this.x, this.y - this.diameter * 0.6);
+      text(title, this.layout.x, this.layout.y - this.layout.diameter * 0.6);
     }
+    
+    this.layout.posUpdate();
+  };
+  
+  this.get_radians = function(data) {
+    var total = sum(data);
+    var radians = [];
+
+    for (let i = 0; i < data.length; i++) {
+      radians.push((data[i] / total) * TWO_PI);
+    }
+
+    return radians;
   };
 
   this.makeLegendItem = function(label, i, colour) {
-    var x = this.x + 50 + this.diameter / 2;
-    var y = this.y + (this.labelSpace * i) - this.diameter / 3;
-    var boxWidth = this.labelSpace / 2;
-    var boxHeight = this.labelSpace / 2;
+    var x = this.layout.x + 50 + this.layout.diameter / 2;
+    var y = this.layout.y + (this.layout.labelSpace * i) - this.layout.diameter / 3;
+    var boxWidth = this.layout.labelSpace / 2;
+    var boxHeight = this.layout.labelSpace / 2;
 
     fill(colour);
     rect(x, y, boxWidth, boxHeight);
@@ -83,3 +136,4 @@ function PieChart(x, y, diameter) {
     text(label, x + boxWidth + 10, y + boxWidth / 2);
   };
 }
+

@@ -1,29 +1,30 @@
 function menu(menuId) {
 	
 	this.menuId = menuId;
+	this.menuObj = select(menuId).child()[3];
 	this.items = [];
-	this.selected = null;
+	this.selected = this.items[0];
 	var self = this;
 	
 	this.selectItem = function(id){
     var index = this.findIndex(id);
     
     if (index != null) {
-      // If the current visualisation has a deselect method run it.
+      // If the current item has a deselect method run it.
       if (this.selected != null && this.selected.hasOwnProperty('destroy')) {
         this.selected.destroy();
       }
-      //visIndex / sourceIndex
-      // Select the visualisation in the gallery.
+			
+      // Select the item in the menu.
       this.selected = this.items[index];
 
-      // Initialise visualisation if necessary.
+      // Initialise visualisation.
       if (this.selected.hasOwnProperty('setup')) {
         this.selected.setup();
       }
 			
+			// 
 			if (this.selected.hasOwnProperty('sources')) {
-				srcMenu.clearMenu();
         srcMenu.items = this.items[index].sources;
 				srcMenu.loadMenu();
       }
@@ -75,48 +76,37 @@ function menu(menuId) {
     this.items.push(item);
   };
 	
-	this.clearMenu = function() {
-		menuItems = select(this.menuId).child();
+  this.loadMenu = function() {
+		
+		// Get menu and button label.
+		var domDropdown = select(this.menuId).child();
+		var domMenu = select("#" + domDropdown[3].id);
+		var menuItems = domMenu.child();
+		
+		// Clear menu.
 		for (x = menuItems.length-1; x > 0; x--) {
 			menuItems[x].remove();
 		}
-	};
-
-  this.loadMenu = function() {
-    // Create menu item.
+		
+		var domBtn = select("#" + domDropdown[1].id);
+		domBtn.html(this.items[0].name);
+		
+		// Add menu items to the menu.
 		for (x = 0; x < this.items.length; x++) {
+			// Create menu item
 			var menuItem = createElement('a', this.items[x].name);
-			/*
-			menuItem.addClass('menu-item');*/
 			menuItem.id(this.items[x].id);
-			/*
-			menuItem.mouseOver(function(e)
+			
+			// Add mouse clicked function to menu item
+			menuItem.mouseClicked(function(e) 
 			{
-					var el = select('#' + e.srcElement.id);
-					el.addClass("hover");
-			});
-				
-			menuItem.mouseOut(function(e)
-			{
-					var el = select('#' + e.srcElement.id);
-					el.removeClass("hover");
-			});
-			*/
-			menuItem.mouseClicked(function(e)
-			{
-					//remove selected class from any other menu-items
-					/*var menuItems = selectAll('.menu-item');
-					
-					for(var i = 0; i < menuItems.length; i++)
-					{ menuItems[i].removeClass('selected'); }
-					
-					var el = select('#' + e.srcElement.id);
-					/*el.addClass('selected');
-					*/
-					self.selectItem(e.srcElement.id);    
+				// Change menu button to currently selected menu item name
+				var domBtn = select("#" + domDropdown[1].id);
+				domBtn.html(e.srcElement.text);
+				self.selectItem(e.srcElement.id);
 			});
 			
-			var domMenu = select(this.menuId);
+			// Make menu item a child node of the menu
 			domMenu.child(menuItem);
 		}
   };

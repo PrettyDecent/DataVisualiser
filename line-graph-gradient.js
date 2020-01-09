@@ -1,38 +1,19 @@
-function ClimateChange() {
+function LineGraphGradient() {
 
   // Name for the visualisation to appear in the menu bar.
-  this.name = 'Climate Change';
+  this.name = 'Line Graph with Gradient';
 
-  // Each visualisation must have a unique ID with no special
-  // characters.
-  this.id = 'climate-change';
+  // Unique ID
+  this.id = 'line-graph-gradient';
+  
+  // List of data sources to be used in visualisation
+  this.sources = [];
+  this.sourceIndex = 0;
 
-  // Names for each axis.
-  this.xAxisLabel = 'year';
-  this.yAxisLabel = '℃';
-
-  var marginSize = 35;
-
-  // Layout object to store all common plot layout parameters and
-  // methods.
   this.layout = {
-    marginSize: marginSize,
-
-    // Locations of margin positions. Left and bottom have double margin
-    // size due to axis and tick labels.
-    leftMargin: marginSize * 2,
-    rightMargin: width - marginSize,
-    topMargin: marginSize,
-    bottomMargin: height - marginSize * 2,
+    marginSize: 35,
     pad: 5,
-
-    plotWidth: function() {
-      return this.rightMargin - this.leftMargin;
-    },
-
-    plotHeight: function() {
-      return this.bottomMargin - this.topMargin;
-    },
+    labelPad: 20,
 
     // Boolean to enable/disable background grid.
     grid: false,
@@ -41,39 +22,45 @@ function ClimateChange() {
     // top of one another.
     numXTickLabels: 8,
     numYTickLabels: 8,
-  };
-
-  // Property to represent whether data has been loaded.
-  this.loaded = false;
-
-  // Preload the data. This function is called automatically by the
-  // gallery when a visualisation is added.
-  this.preload = function() {
-    var self = this;
-    this.data = loadTable(
-      './data/surface-temperature/surface-temperature.csv', 'csv', 'header',
-      // Callback function to set the value
-      // this.loaded to true.
-      function(table) {
-        self.loaded = true;
-      });
+    
+    posUpdate: function() {
+      // Locations of margin positions. Left and bottom have double margin
+      // size due to axis and tick labels.
+      this.rightMargin = width - this.marginSize;
+      this.leftMargin = this.marginSize * 1.5;
+      this.plotWidth = this.rightMargin - this.leftMargin;
+      this.topMargin = this.marginSize;
+      this.bottomMargin = height - this.marginSize * 2.5;
+    }
   };
 
   this.setup = function() {
+    
+    this.source = this.sources[this.sourceIndex];
+    
+    if (!this.source.loaded) {
+      console.log('Data not yet loaded');
+      return;
+    }
+    
     // Font defaults.
     textSize(16);
     textAlign('center', 'center');
+    
+    // Names for each axis.
+    this.xAxisLabel = this.source.data.columns[0];
+    this.yAxisLabel = this.source.units;
 
     // Set min and max years: assumes data is sorted by year.
-    this.minYear = this.data.getNum(0, 'year');
-    this.maxYear = this.data.getNum(this.data.getRowCount() - 1, 'year');
+    this.minYear = this.source.data.getNum(0, 'year');
+    this.maxYear = this.source.data.getNum(this.source.data.getRowCount() - 1, 'year');
 
     // Find min and max temperature for mapping to canvas height.
-    this.minTemperature = min(this.data.getColumn('temperature'));
-    this.maxTemperature = max(this.data.getColumn('temperature'));
+    this.minTemperature = min(this.source.data.getColumn(1));
+    this.maxTemperature = max(this.source.data.getColumn(1));
 
     // Find mean temperature to plot average marker.
-    this.meanTemperature = mean(this.data.getColumn('temperature'));
+    this.meanTemperature = mean(this.source.data.getColumn(1));
 
     // Count the number of frames drawn since the visualisation
     // started so that we can animate the plot.
@@ -85,13 +72,11 @@ function ClimateChange() {
                                     this.maxYear - 1,
                                     this.minYear,
                                     1);
-    this.startSlider.position(400, 10);
 
     this.endSlider = createSlider(this.minYear + 1,
                                   this.maxYear,
                                   this.maxYear,
                                   1);
-    this.endSlider.position(600, 10);
   };
 
   this.destroy = function() {
@@ -100,10 +85,13 @@ function ClimateChange() {
   };
 
   this.draw = function() {
-    if (!this.loaded) {
+    if (!this.source.loaded) {
       console.log('Data not yet loaded');
       return;
     }
+    
+    this.startSlider.position((this.layout.plotWidth / 2) - 100, 100);
+    this.endSlider.position((this.layout.plotWidth / 2) + 100, 100);
 
     // Prevent slider ranges overlapping.
     if (this.startSlider.value() >= this.endSlider.value()) {
@@ -139,20 +127,20 @@ function ClimateChange() {
     // width of the canvas minus margins.
     var previous;
     var numYears = this.endYear - this.startYear;
-    var segmentWidth = this.layout.plotWidth() / numYears;
+    var segmentWidth = this.layout.plotWidth / numYears;
 
     // Count the number of years plotted each frame to create
     // animation effect.
     var yearCount = 0;
 
     // Loop over all rows but only plot those in range.
-    for (var i = 0; i < this.data.getRowCount(); i++) {
+    for (var i = 0; i < this.source.data.getRowCount(); i++) {
 
       // Create an object to store data for the current year.
       var current = {
         // Convert strings to numbers.
-        'year': this.data.getNum(i, 'year'),
-        'temperature': this.data.getNum(i, 'temperature')
+        'year': this.source.data.getNum(i, 'year'),
+        'temperature': this.source.data.getNum(i, 1)
       };
 
       if (previous != null
@@ -216,6 +204,8 @@ function ClimateChange() {
     if (this.frameCount >= numYears) {
       //noLoop();
     }
+    
+    this.layout.posUpdate();
   };
 
   this.mapYearToWidth = function(value) {

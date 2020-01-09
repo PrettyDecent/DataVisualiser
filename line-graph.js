@@ -1,41 +1,22 @@
-function PayGapTimeSeries() {
+function LineGraph() {
 
   // Name for the visualisation to appear in the menu bar.
-  this.name = 'Pay gap: 1997-2017';
+  this.name = 'Line Graph';
 
   // Each visualisation must have a unique ID with no special
   // characters.
-  this.id = 'pay-gap-timeseries';
-
-  // Title to display above the plot.
-  this.title = 'Gender Pay Gap: Average difference between male and female pay.';
-
-    // Names for each axis.
-  this.xAxisLabel = 'year';
-  this.yAxisLabel = '%';
-
-  var marginSize = 35;
+  this.id = 'line-graph';
+  
+  // List of data sources to be used in visualisation
+  this.sources = [];
+  this.sourceIndex = 0;
 
   // Layout object to store all common plot layout parameters and
   // methods.
   this.layout = {
-    marginSize: marginSize,
-
-    // Locations of margin positions. Left and bottom have double margin
-    // size due to axis and tick labels.
-    leftMargin: marginSize * 2,
-    rightMargin: width - marginSize,
-    topMargin: marginSize,
-    bottomMargin: height - marginSize * 2,
+    marginSize: 35,
     pad: 5,
-
-    plotWidth: function() {
-      return this.rightMargin - this.leftMargin;
-    },
-
-    plotHeight: function() {
-      return this.bottomMargin - this.topMargin;
-    },
+    labelPad: 20,
 
     // Boolean to enable/disable background grid.
     grid: true,
@@ -44,43 +25,48 @@ function PayGapTimeSeries() {
     // top of one another.
     numXTickLabels: 10,
     numYTickLabels: 8,
-  };
-
-  // Property to represent whether data has been loaded.
-  this.loaded = false;
-
-  // Preload the data. This function is called automatically by the
-  // gallery when a visualisation is added.
-  this.preload = function() {
-    var self = this;
-    this.data = loadTable(
-      './data/pay-gap/all-employees-hourly-pay-by-gender-1997-2017.csv', 'csv', 'header',
-      // Callback function to set the value
-      // this.loaded to true.
-      function(table) {
-        self.loaded = true;
-      });
-
+    
+    posUpdate: function() {
+      // Locations of margin positions. Left and bottom have double margin
+      // size due to axis and tick labels.
+      this.rightMargin = width - this.marginSize;
+      this.leftMargin = this.marginSize * 2;
+      this.plotWidth = this.rightMargin - this.leftMargin;
+      this.topMargin = this.marginSize;
+      this.bottomMargin = height - this.marginSize * 2.5;
+    }
   };
 
   this.setup = function() {
+    
+    this.source = this.sources[this.sourceIndex];
+    
+    if (!this.source.loaded) {
+      console.log('Data not yet loaded');
+      return;
+    }
+    
     // Font defaults.
     textSize(16);
+    
+    // Names for each axis.
+    this.xAxisLabel = this.source.data.columns[0];
+    this.yAxisLabel = this.source.units;
 
     // Set min and max years: assumes data is sorted by date.
-    this.startYear = this.data.getNum(0, 'year');
-    this.endYear = this.data.getNum(this.data.getRowCount() - 1, 'year');
+    this.startYear = this.source.data.getNum(0, 0);
+    this.endYear = this.source.data.getNum(this.source.data.getRowCount() - 1, 0);
 
     // Find min and max pay gap for mapping to canvas height.
-    this.minPayGap = 0;         // Pay equality (zero pay gap).
-    this.maxPayGap = max(this.data.getColumn('pay_gap'));
+    this.minPayGap = toNearestMult(min(this.source.data.getColumn(1)), 10, true);
+    this.maxPayGap = toNearestMult(max(this.source.data.getColumn(1)), 10, false);
   };
 
   this.destroy = function() {
   };
 
   this.draw = function() {
-    if (!this.loaded) {
+    if (!this.source.loaded) {
       console.log('Data not yet loaded');
       return;
     }
@@ -93,7 +79,7 @@ function PayGapTimeSeries() {
                         this.maxPayGap,
                         this.layout,
                         this.mapPayGapToHeight.bind(this),
-                        0);
+                        1);
 
     // Draw x and y axis.
     drawAxis(this.layout);
@@ -110,13 +96,13 @@ function PayGapTimeSeries() {
 
     // Loop over all rows and draw a line from the previous value to
     // the current.
-    for (var i = 0; i < this.data.getRowCount(); i++) {
+    for (var i = 0; i < this.source.data.getRowCount(); i++) {
 
       // Create an object to store data for the current year.
       var current = {
         // Convert strings to numbers.
-        'year': this.data.getString(i, 'year'),
-        'payGap': this.data.getNum(i, 'pay_gap')
+        'year': this.source.data.getString(i, 0),
+        'dependent': this.source.data.getNum(i, 1)
       };
 
       if (previous != null) {
@@ -125,7 +111,7 @@ function PayGapTimeSeries() {
         stroke(0);
         
         //console.log(this.mapYearToWidth(current.year));
-        line(this.mapYearToWidth(previous.year), this.mapPayGapToHeight(previous.payGap), this.mapYearToWidth(current.year), this.mapPayGapToHeight(current.payGap));
+        line(this.mapYearToWidth(previous.year), this.mapPayGapToHeight(previous.dependent), this.mapYearToWidth(current.year), this.mapPayGapToHeight(current.dependent));
         
         // The number of x-axis labels to skip so that only
         // numXTickLabels are drawn.
@@ -143,6 +129,8 @@ function PayGapTimeSeries() {
       // position of the next line segment.
       previous = current;
     }
+    
+    this.layout.posUpdate();
   };
 
   this.drawTitle = function() {
@@ -150,8 +138,8 @@ function PayGapTimeSeries() {
     noStroke();
     textAlign('center', 'center');
 
-    text(this.title,
-         (this.layout.plotWidth() / 2) + this.layout.leftMargin,
+    text(this.source.name,
+         (this.layout.plotWidth / 2) + this.layout.leftMargin,
          this.layout.topMargin - (this.layout.marginSize / 2));
   };
 
