@@ -1,10 +1,17 @@
-function menu(menuId) {
+function Menu(menuId) {
 	
 	this.menuId = menuId;
 	this.menuObj = select(menuId).child()[3];
 	this.items = [];
-	this.selected = this.items[0];
+	this.selected = null;
+	this.parentMenu = null;
+	this.childMenu = null;
 	var self = this;
+	
+	this.addSubMenu = function(childMenu) {
+		this.childMenu = childMenu;
+		childMenu.parentMenu = this;
+	};
 	
 	this.selectItem = function(id){
     var index = this.findIndex(id);
@@ -15,28 +22,27 @@ function menu(menuId) {
         this.selected.destroy();
       }
 			
-      // Select the item in the menu.
-      this.selected = this.items[index];
-
-      // Initialise visualisation.
-      if (this.selected.hasOwnProperty('setup')) {
-        this.selected.setup();
+			// Select the item in the menu.
+			this.selected = this.items[index];
+			
+			// Load sources into menu, loads visual
+			if (this.childMenu != null) {
+        this.childMenu.items = this.items[index].sources;
+				this.selected.sourceIndex = 0;
+				this.childMenu.loadMenu();
+				this.selected.setup();
       }
 			
-			// 
-			if (this.selected.hasOwnProperty('sources')) {
-        srcMenu.items = this.items[index].sources;
-				srcMenu.loadMenu();
+			// Load specific source into visual
+			if (this.parentMenu != null) {
+				this.parentMenu.selected.sourceIndex = index;
+				if (this.parentMenu.selected.hasOwnProperty('destroy')) {
+					this.parentMenu.selected.destroy();
+				}
+				this.parentMenu.selected.setup();
       }
 			
-			if (this.selected.hasOwnProperty('location')) {
-				visMenu.selected.sourceIndex = index;
-				visMenu.selected.destroy();
-				visMenu.selected.setup();
-      }
-			
-      // Enable animation in case it has been paused by the current
-      // visualisation.
+      // Enable animation in case it has been paused
       loop();
     }
   };
@@ -88,9 +94,6 @@ function menu(menuId) {
 			menuItems[x].remove();
 		}
 		
-		var domBtn = select("#" + domDropdown[1].id);
-		domBtn.html(this.items[0].name);
-		
 		// Add menu items to the menu.
 		for (x = 0; x < this.items.length; x++) {
 			// Only if item is loaded
@@ -107,7 +110,7 @@ function menu(menuId) {
 			// Add mouse clicked function to menu item
 			menuItem.mouseClicked(function(e) 
 			{
-				// Change menu button to currently selected menu item name
+				// Change visual menu button to currently selected menu item name
 				var domBtn = select("#" + domDropdown[1].id);
 				domBtn.html(e.srcElement.text);
 				self.selectItem(e.srcElement.id);
@@ -116,5 +119,12 @@ function menu(menuId) {
 			// Make menu item a child node of the menu
 			domMenu.child(menuItem);
 		}
+		
+		if (this.parentMenu != null) {
+			this.selected = this.items[0];
+			// Set source menu button to currently selected menu item name
+			var domBtn = select("#" + domDropdown[1].id);
+		  domBtn.html(this.items[this.parentMenu.selected.sourceIndex].name);
+    }
   };
 }

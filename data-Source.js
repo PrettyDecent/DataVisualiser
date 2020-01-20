@@ -1,9 +1,8 @@
-function dataSource(id, name, location, units) {
+function DataSource(id, name, location, units) {
 	this.id = id;
 	this.name = name;
 	this.location = location;
 	this.loaded = false;
-	this.test = "No";
 	
 	if (units == undefined) {
 		this.units = "";

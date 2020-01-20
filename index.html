@@ -2,32 +2,34 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta content="text/html">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Data visualisation</title>
 
     <!-- Libraries -->
-    <script src="lib/p5.min.js"></script>
-    <script src="lib/p5.dom.min.js"></script>
+    <script src="lib/p5.min.js" charset="utf-8"></script>
+    <script src="lib/p5.dom.min.js" charset="utf-8"></script>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" charset="utf-8">
 
     <!-- Main sketch file -->
-    <script src="sketch.js"></script>
+    <script src="sketch.js" charset="utf-8"></script>
 
     <!-- Main visualisation files -->
     <script src="pie-chart.js"></script>
     <script src="split-bar-chart.js"></script>
-    <script src="scatter-graph.js"></script>
+    <script src="bubble-chart.js" charset="utf-8"></script>
     <script src="line-graph.js"></script>
     <script src="line-graph-gradient.js"></script>
 
     <!-- Add extra scripts below -->
-    <script src="helper-functions.js"></script>
+    <script src="helper-functions.js" charset="utf-8"></script>
     <script src="gallery.js"></script>
     <script src="pie-chart.js"></script>
-    <script src="data-source.js"></script>
+    <script src="data-source.js" charset="utf-8"></script>
     <script src="menu.js"></script>
+    <script src="bubble.js"></script>
     
     <script src="require.js"></script>
   </head>
@@ -43,7 +45,7 @@
       
       <!-- Selection bar for the sources -->
       <div class="dropdown" id="drop-source">
-        <a class="dropbtn" id="btn-source">Select a source</a>
+        <a class="dropbtn" id="btn-source"></a>
         <div class="dropdown-content" id="sources-menu">
         </div>
       </div>

@@ -12,6 +12,10 @@ body{
   padding: 5px;
 }
 
+.select {
+  display: none;
+}
+
 .container {
   display: flex;
 }

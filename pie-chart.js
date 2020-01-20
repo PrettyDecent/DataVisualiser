@@ -8,15 +8,13 @@ function PieChart() {
   
   // List of data sources to be used in visualisation
   this.sources = [];
-  this.sourceIndex = 0;
+  this.sourceIndex = null;
  
   this.layout = {
     x: width * 0.5,
     y: height * 0.55,
     diameter: width * 0.38,
     labelSpace: 30,
-    selectX: 200,
-    selectY: 200,
     
     posUpdate: function() {
       this.x = width * 0.5;
@@ -35,11 +33,13 @@ function PieChart() {
 
     // Create a select DOM element.
     this.select = createSelect();
-
+    this.select.position(width * 0.5, (this.layout.y - this.layout.diameter * 0.6) + (this.layout.labelSpace * 3.3));
+    this.select.center('horizontal');
     // Fill the select object with the options names.
     for (var i = 1; i < this.source.data.getColumnCount(); i++) {
       this.select.option(this.source.data.columns[i]);
-    } 
+    }
+    this.select.center('horizontal');
   };
 
   this.destroy = function() {
@@ -47,11 +47,6 @@ function PieChart() {
   };
 
   this.draw = function() {
-    if (!this.source.loaded) {
-      console.log('Data not yet loaded');
-      return;
-    }
-    
     // Get the current option from the select item.
     var variantName = this.select.value();
 
@@ -71,8 +66,10 @@ function PieChart() {
     var title = this.source.name;
     // https://p5js.org/examples/form-pie-chart.html
     
-    this.select.position(this.layout.x + 50 + this.layout.diameter / 2, this.layout.selectY + 500 - this.layout.diameter / 3);
-
+    // Position the select DOM element
+    //this.select.position(width * 0.5, (this.layout.y - this.layout.diameter * 0.6) + (this.layout.labelSpace * 3.3));
+    //this.select.center('horizontal');
+    
     var angles = this.get_radians(col);
     var lastAngle = 0;
     var colour;
@@ -103,7 +100,7 @@ function PieChart() {
       noStroke();
       textAlign('center', 'center');
       textSize(24);
-      text(title, this.layout.x, this.layout.y - this.layout.diameter * 0.6);
+      text(title, this.layout.x, (this.layout.y - this.layout.diameter * 0.6) - this.layout.labelSpace);
     }
     
     this.layout.posUpdate();
@@ -133,7 +130,12 @@ function PieChart() {
     noStroke();
     textAlign('left', 'center');
     textSize(12);
-    text(label, x + boxWidth + 10, y + boxWidth / 2);
+    text(makeTitle(label), x + boxWidth + 10, y + boxWidth / 2);
+  };
+  
+  this.resizeEvent = function() {
+    this.select.position(width * 0.5, (this.layout.y - this.layout.diameter * 0.6) + (this.layout.labelSpace * 3.3));
+    this.select.center('horizontal');
   };
 }
 

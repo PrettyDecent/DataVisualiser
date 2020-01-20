@@ -66,6 +66,21 @@ function createRange(value) {
   return range;
 }
 
+function getUnits(header) {
+  for (var x = 0; x < header.length; x++) {
+    if (header.charAt(x-1) == "(") {
+      var units = "";
+      do
+      {
+        units = units + header.charAt(x);
+        x++;
+      } while (header.charAt(x) != ")");
+      return units;
+    }
+  }
+  return "";
+}
+
 // --------------------------------------------------------------------
 // Plotting helper functions
 // --------------------------------------------------------------------

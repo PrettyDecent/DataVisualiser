@@ -49,25 +49,24 @@ function LineGraphGradient() {
     
     // Names for each axis.
     this.xAxisLabel = this.source.data.columns[0];
-    this.yAxisLabel = this.source.units;
+    this.yAxisLabel = getUnits(this.source.data.columns[1]);
 
     // Set min and max years: assumes data is sorted by year.
     this.minYear = this.source.data.getNum(0, 'year');
     this.maxYear = this.source.data.getNum(this.source.data.getRowCount() - 1, 'year');
 
     // Find min and max temperature for mapping to canvas height.
-    this.minTemperature = min(this.source.data.getColumn(1));
-    this.maxTemperature = max(this.source.data.getColumn(1));
+    this.minYValue = min(this.source.data.getColumn(1));
+    this.maxYValue = max(this.source.data.getColumn(1));
 
     // Find mean temperature to plot average marker.
-    this.meanTemperature = mean(this.source.data.getColumn(1));
+    this.meanYValue = mean(this.source.data.getColumn(1));
 
     // Count the number of frames drawn since the visualisation
     // started so that we can animate the plot.
     this.frameCount = 0;
 
-    // Create sliders to control start and end years. Default to
-    // visualise full range.
+    // Create sliders to control start and end years. 
     this.startSlider = createSlider(this.minYear,
                                     this.maxYear - 1,
                                     this.minYear,
@@ -85,10 +84,6 @@ function LineGraphGradient() {
   };
 
   this.draw = function() {
-    if (!this.source.loaded) {
-      console.log('Data not yet loaded');
-      return;
-    }
     
     this.startSlider.position((this.layout.plotWidth / 2) - 100, 100);
     this.endSlider.position((this.layout.plotWidth / 2) + 100, 100);
@@ -101,8 +96,8 @@ function LineGraphGradient() {
     this.endYear = this.endSlider.value();
 
     // Draw all y-axis tick labels.
-    drawYAxisTickLabels(this.minTemperature,
-                        this.maxTemperature,
+    drawYAxisTickLabels(this.minYValue,
+                        this.maxYValue,
                         this.layout,
                         this.mapTemperatureToHeight.bind(this),
                         1);
@@ -119,9 +114,9 @@ function LineGraphGradient() {
     stroke(200);
     strokeWeight(1);
     line(this.layout.leftMargin,
-         this.mapTemperatureToHeight(this.meanTemperature),
+         this.mapTemperatureToHeight(this.meanYValue),
          this.layout.rightMargin,
-         this.mapTemperatureToHeight(this.meanTemperature));
+         this.mapTemperatureToHeight(this.meanYValue));
 
     // Plot all temperatures between startYear and endYear using the
     // width of the canvas minus margins.
@@ -140,7 +135,7 @@ function LineGraphGradient() {
       var current = {
         // Convert strings to numbers.
         'year': this.source.data.getNum(i, 'year'),
-        'temperature': this.source.data.getNum(i, 1)
+        'dependent': this.source.data.getNum(i, 1)
       };
 
       if (previous != null
@@ -150,16 +145,16 @@ function LineGraphGradient() {
         // Draw background gradient to represent colour temperature of
         // the current year.
         noStroke();
-        fill(this.mapTemperatureToColour(current.temperature));
+        fill(this.mapTemperatureToColour(current.dependent));
         rect(this.mapYearToWidth(previous.year), this.layout.topMargin, segmentWidth, this.layout.bottomMargin - this.layout.topMargin);
 
         // Draw line segment connecting previous year to current
         // year temperature.
         stroke(0);
         line(this.mapYearToWidth(previous.year),
-             this.mapTemperatureToHeight(previous.temperature),
+             this.mapTemperatureToHeight(previous.dependent),
              this.mapYearToWidth(current.year),
-             this.mapTemperatureToHeight(current.temperature));
+             this.mapTemperatureToHeight(current.dependent));
 
         // The number of x-axis labels to skip so that only
         // numXTickLabels are drawn.
@@ -218,16 +213,16 @@ function LineGraphGradient() {
 
   this.mapTemperatureToHeight = function(value) {
     return map(value,
-               this.minTemperature,
-               this.maxTemperature,
+               this.minYValue,
+               this.maxYValue,
                this.layout.bottomMargin, // Lower temperature at bottom.
                this.layout.topMargin);   // Higher temperature at top.
   };
 
   this.mapTemperatureToColour = function(value) {
     var red =  map(value,
-                   this.minTemperature,
-                   this.maxTemperature,
+                   this.minYValue,
+                   this.maxYValue,
                    0,
                    255);
     var blue = 255 - red;

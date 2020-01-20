@@ -11,18 +11,13 @@ function LineGraph() {
   this.sources = [];
   this.sourceIndex = 0;
 
-  // Layout object to store all common plot layout parameters and
-  // methods.
   this.layout = {
     marginSize: 35,
     pad: 5,
     labelPad: 20,
-
-    // Boolean to enable/disable background grid.
     grid: true,
 
-    // Number of axis tick labels to draw so that they are not drawn on
-    // top of one another.
+    // Number of axis tick labels to draw
     numXTickLabels: 10,
     numYTickLabels: 8,
     
@@ -51,34 +46,26 @@ function LineGraph() {
     
     // Names for each axis.
     this.xAxisLabel = this.source.data.columns[0];
-    this.yAxisLabel = this.source.units;
+    this.yAxisLabel = getUnits(this.source.data.columns[1]);
 
     // Set min and max years: assumes data is sorted by date.
     this.startYear = this.source.data.getNum(0, 0);
     this.endYear = this.source.data.getNum(this.source.data.getRowCount() - 1, 0);
 
-    // Find min and max pay gap for mapping to canvas height.
-    this.minPayGap = toNearestMult(min(this.source.data.getColumn(1)), 10, true);
-    this.maxPayGap = toNearestMult(max(this.source.data.getColumn(1)), 10, false);
-  };
-
-  this.destroy = function() {
+    // Find min and max Y value for mapping to canvas height.
+    this.minYValue = toNearestMult(min(this.source.data.getColumn(1)), 10, true);
+    this.maxYValue = toNearestMult(max(this.source.data.getColumn(1)), 10, false);
   };
 
   this.draw = function() {
-    if (!this.source.loaded) {
-      console.log('Data not yet loaded');
-      return;
-    }
-
     // Draw the title above the plot.
     this.drawTitle();
 
     // Draw all y-axis labels.
-    drawYAxisTickLabels(this.minPayGap,
-                        this.maxPayGap,
+    drawYAxisTickLabels(this.minYValue,
+                        this.maxYValue,
                         this.layout,
-                        this.mapPayGapToHeight.bind(this),
+                        this.mapYValueToHeight.bind(this),
                         1);
 
     // Draw x and y axis.
@@ -89,13 +76,12 @@ function LineGraph() {
                    this.yAxisLabel,
                    this.layout);
 
-    // Plot all pay gaps between startYear and endYear using the width
+    // Plot all values in the dependent column between startYear and endYear using the width
     // of the canvas minus margins.
     var previous;
     var numYears = this.endYear - this.startYear;
 
-    // Loop over all rows and draw a line from the previous value to
-    // the current.
+    // Loop over all rows and draw a line from the previous value to the current.
     for (var i = 0; i < this.source.data.getRowCount(); i++) {
 
       // Create an object to store data for the current year.
@@ -106,15 +92,11 @@ function LineGraph() {
       };
 
       if (previous != null) {
-        // Draw line segment connecting previous year to current
-        // year pay gap.
+        // Draw line segment 
         stroke(0);
+        line(this.mapYearToWidth(previous.year), this.mapYValueToHeight(previous.dependent), this.mapYearToWidth(current.year), this.mapYValueToHeight(current.dependent));
         
-        //console.log(this.mapYearToWidth(current.year));
-        line(this.mapYearToWidth(previous.year), this.mapPayGapToHeight(previous.dependent), this.mapYearToWidth(current.year), this.mapPayGapToHeight(current.dependent));
-        
-        // The number of x-axis labels to skip so that only
-        // numXTickLabels are drawn.
+        // The number of x-axis labels to skip 
         var xLabelSkip = ceil(numYears / this.layout.numXTickLabels);
 
         // Draw the tick label marking the start of the previous year.
@@ -124,9 +106,7 @@ function LineGraph() {
         }
       }
 
-      // Assign current year to previous year so that it is available
-      // during the next iteration of this loop to give us the start
-      // position of the next line segment.
+      // Assign current year to previous year so its line end is accessible 
       previous = current;
     }
     
@@ -151,10 +131,10 @@ function LineGraph() {
                this.layout.rightMargin);
   };
 
-  this.mapPayGapToHeight = function(value) {
+  this.mapYValueToHeight = function(value) {
     return map(value,
-               this.minPayGap,
-               this.maxPayGap,
+               this.minYValue,
+               this.maxYValue,
                this.layout.bottomMargin,   // Draw top-to-bottom from margin.
                this.layout.topMargin);
   };

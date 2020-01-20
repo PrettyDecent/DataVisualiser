@@ -10,8 +10,6 @@ function SplitBarChart() {
   this.sources = [];
   this.sourceIndex = 0;
 
-  // Layout object to store all common plot layout parameters and
-  // methods.
   this.layout = {
     // Locations of margin positions. Left and bottom have double margin
     // size due to axis and tick labels.
@@ -61,16 +59,15 @@ function SplitBarChart() {
 
   this.draw = function() {
 
-    // Draw Female/Male labels at the top of the plot.
+    // Draw split labels at the top of the plot.
     this.drawCategoryLabels();
     
-    var lineHeight = (this.layout.bottomMargin - this.layout.topMargin) /
-        this.source.data.getRowCount();
-
+    var lineHeight = (this.layout.bottomMargin - this.layout.topMargin) / this.source.data.getRowCount();
+    
     for (var i = 0; i < this.source.data.getRowCount(); i++) {
       // Calculate the y position for each company.
       var lineY = (lineHeight * i) + this.layout.topMargin;
-
+      
       // Create an object that stores data from the current row.
       var group = {
         // Convert strings to numbers.

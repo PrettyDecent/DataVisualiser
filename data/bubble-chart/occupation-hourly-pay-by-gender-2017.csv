@@ -1,4 +1,4 @@
-job_subtype,num jobs,proportion female,pay gap
+job_subtype,num jobs,proportion female (%),pay gap (£k)
 Corporate managers and directors,2161,32.39241092,14.27368421
 Other managers and proprietors,436,47.47706422,7.36196319
 "Science, research, engineering and technology professionals",1284,19.1588785,9.672830725
