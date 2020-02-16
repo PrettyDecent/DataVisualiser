@@ -81,6 +81,69 @@ function getUnits(header) {
   return "";
 }
 
+function dataIsInt(source) {
+  var item = parseInt(source);
+  return !isNaN(item);
+}
+
+function drawConstrainedLabel(label, xLoc, yLoc, objWidth, lineMax) {
+	var labelTitle = makeTitle(label);
+  //lineMax = 36;
+		
+	// Break the title into an array of words
+	var words = [];
+	var word = "";
+	for (var x = 0; x < labelTitle.length; x++) {
+		if (labelTitle.charAt(x) != " ") {
+			word += labelTitle.charAt(x);
+		} else {
+			words.push(word);
+			word = "";
+		}
+	}
+	words.push(word);
+	
+	// Construct the longest possible line
+	var lines = [];
+	var line = "";
+  textSize(18);
+  
+	for (var y = 0; y < words.length; y++) {
+		if (textWidth(line) + textWidth(words[y]) + 1 < objWidth) {
+			line += words[y] + " ";
+		} else {
+      // Then break and start a new line
+			if (line != "") {
+				lines.push(line.slice(0, line.length-1));
+			}
+			line = words[y] + " ";
+		}
+	}
+	lines.push(line.slice(0, line.length-1));
+  
+  // If lines are too deep, remove lines and add ellipses
+  if (lines.length * 18 > lineMax) {
+    while (lines.length * 18 > lineMax) {
+      lines.pop();
+    }
+    lines[lines.length-1] += "...";
+  }
+  
+	// Draw all lines to screen
+	for (var z = 0; z < lines.length; z++) {
+		push();
+			textAlign('center', 'center');
+			fill(0);
+			textSize(18);
+			text(lines[z],
+					 xLoc + (objWidth / 2),
+					 yLoc + ((z)*18));
+		pop();
+	}
+  
+	return lines.length;
+}
+
 // --------------------------------------------------------------------
 // Plotting helper functions
 // --------------------------------------------------------------------
@@ -120,7 +183,7 @@ function drawAxisLabels(xLabel, yLabel, layout) {
   pop();
 }
 
-this.setLeftMargin = function(layout, text) {
+function setLeftMargin(layout, text) {
   if (layout.leftMargin < textWidth(text) + layout.labelPad + 20) {
     layout.leftMargin = textWidth(text) + layout.labelPad + 20;
   }
@@ -129,7 +192,7 @@ this.setLeftMargin = function(layout, text) {
 function drawYAxisTickLabels(min, max, layout, mapFunction, decimalPlaces) {
   // Map function must be passed with .bind(this).
   var range = max - min;
-  var yTickStep = range / layout.numYTickLabels;
+  var yTickStep = (range / layout.numYTickLabels);
   var setMargin = false;
 
   fill(0);
@@ -184,6 +247,12 @@ function drawXAxisTickLabel(value, layout, mapFunction) {
          layout.topMargin,
          x,
          layout.bottomMargin);
+  }
+}
+
+function setBottomMargin(yLocation, layout) {
+  if (layout.bottomMargin < (layout.bottomMargin + (yLocation - layout.bottomMargin))) {
+    layout.bottomMargin -= (yLocation - layout.bottomMargin);
   }
 }
 

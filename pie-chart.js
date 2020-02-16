@@ -18,28 +18,33 @@ function PieChart() {
     
     posUpdate: function() {
       this.x = width * 0.5;
-      this.diameter = width * 0.38;
+      this.y = height * 0.55;
+
+      var inSize = 0.85;
+      if (width < height) {
+        this.diameter = width * inSize;
+      } else {
+        this.diameter = (height * inSize); // - 50;
+      }
     }
   };
   
   this.setup = function() {
-    
+    this.layout.posUpdate();
     this.source = this.sources[this.sourceIndex];
     
     if (!this.source.loaded) {
       console.log('Data not yet loaded');
       return;
     }
-
     // Create a select DOM element.
     this.select = createSelect();
-    this.select.position(width * 0.5, (this.layout.y - this.layout.diameter * 0.6) + (this.layout.labelSpace * 3.3));
-    this.select.center('horizontal');
+    
     // Fill the select object with the options names.
     for (var i = 1; i < this.source.data.getColumnCount(); i++) {
       this.select.option(this.source.data.columns[i]);
     }
-    this.select.center('horizontal');
+    this.resizeEvent();
   };
 
   this.destroy = function() {
@@ -65,10 +70,6 @@ function PieChart() {
     // Make a title.
     var title = this.source.name;
     // https://p5js.org/examples/form-pie-chart.html
-    
-    // Position the select DOM element
-    //this.select.position(width * 0.5, (this.layout.y - this.layout.diameter * 0.6) + (this.layout.labelSpace * 3.3));
-    //this.select.center('horizontal');
     
     var angles = this.get_radians(col);
     var lastAngle = 0;
@@ -100,7 +101,7 @@ function PieChart() {
       noStroke();
       textAlign('center', 'center');
       textSize(24);
-      text(title, this.layout.x, (this.layout.y - this.layout.diameter * 0.6) - this.layout.labelSpace);
+      text(title, this.layout.x, (this.layout.y * 0) + this.layout.labelSpace);
     }
     
     this.layout.posUpdate();
@@ -134,7 +135,8 @@ function PieChart() {
   };
   
   this.resizeEvent = function() {
-    this.select.position(width * 0.5, (this.layout.y - this.layout.diameter * 0.6) + (this.layout.labelSpace * 3.3));
+    // Position the select DOM element
+    this.select.position(width * 0.5, this.layout.labelSpace * 5.2);//(height * 0.1) + this.layout.labelSpace);
     this.select.center('horizontal');
   };
 }
