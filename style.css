@@ -44,11 +44,13 @@ body{
 }
 
 #drop-visual {
-  width: 60%;
+  flex-grow: 1;
 }
 
+/* Hidden on start, so it can appear once a visual is selected */
 #drop-source {
   width: 40%;
+  display: none;
 }
 
  /* Dropdown Button */

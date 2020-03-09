@@ -30,8 +30,10 @@ function BubbleChart() {
   };
 
   this.setup = function() {
+    // Load the current source to display
     this.source = this.sources[this.sourceIndex];
     
+    // Error check to see that source is loaded
     if (!this.source.loaded) {
       console.log('Data not yet loaded');
       return;
@@ -80,10 +82,11 @@ function BubbleChart() {
                        this.layout.bottomMargin);
     this.drawArrowAxisLabels(xValueMin, yValueMin, this.source.data.columns[2], this.source.data.columns[3], xValueMax, yValueMax, xUnits, yUnits);
     
+    // Array to store the bubbles generated from the data
     var dots = [];
     
     for (i = 0; i < this.source.data.getRowCount(); i++) {
-      // Create a dot for each point.
+      // Create a dot for each row
       x = map(xValue[i], xValueMin, xValueMax, this.layout.leftMargin + this.layout.marginSize, this.layout.rightMargin - this.layout.marginSize);
       y = map(yValue[i], yValueMin, yValueMax, this.layout.bottomMargin - this.layout.marginSize, this.layout.topMargin + this.layout.marginSize);
       size = map(dotValue[i], dotValueMin, dotValueMax, this.layout.dotSizeMin, this.layout.dotSizeMax);
@@ -95,11 +98,12 @@ function BubbleChart() {
     for (y = 0; y < dots.length; y++) {
       dots[y].draw();
     }
-    // Draw all dot labels seperately to make text appear over dots
+    // Draw all dot labels seperately to make text appear above the dots
     for (z = 0; z < dots.length; z++) {
       dots[z].drawLabels();
     }
     
+    // Update the values of the location dependent variables
     this.layout.posUpdate();
   };
   
@@ -165,9 +169,11 @@ function BubbleChart() {
   };
   
   this.drawArrowAxisLabels = function(xMinLabel, yMinLabel, xMidLabel, yMidLabel, xMaxLabel, yMaxLabel, xUnits, yUnits) {
+    
     noStroke();
     textAlign('center', 'center');
     textSize(18);
+    // Create labels for the start, middle and end of the arrows running across the chart
     var xMinTitle = xMinLabel +""+ xUnits;
     var yMinTitle = yMinLabel +""+ yUnits;
     var xMidTitle = makeTitle(xMidLabel);
@@ -175,7 +181,7 @@ function BubbleChart() {
     var xMaxTitle = xMaxLabel +""+ xUnits;
     var yMaxTitle = yMaxLabel +""+ yUnits;
     
-    // Draw rectangle backgounds for the labels
+    // Draw white rectangle backgounds for the labels
     push();
     fill(255);
     rectMode(CENTER);

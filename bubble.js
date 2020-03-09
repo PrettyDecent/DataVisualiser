@@ -6,14 +6,15 @@ function Bubble(colour, label, x, y, size, layout) {
 	this.x = x;
 	this.y = y;
 	
+	// Detect if mouse is over the bubble
 	this.mouseOver = function() {
 		if (dist(this.x, this.y, mouseX, mouseY) < this.size / 2){
-				//console.log("Within: "+ this.label);
 				return true;
 		}
 		return false;
 	};
 	
+	// If the text for the bubble goes off screen, this function corrects it
 	this.xWithinBounds = function() {
 		if (this.x - (textWidth(this.label) / 2) < layout.leftMargin) {
 			// Correct text going off the left side of the screen
@@ -26,6 +27,7 @@ function Bubble(colour, label, x, y, size, layout) {
 		}
 	};
 	
+	// Draws the label of the bubble
 	this.drawLabels = function() {
 		if (this.mouseOver()) {
 			push();
@@ -38,9 +40,11 @@ function Bubble(colour, label, x, y, size, layout) {
 		}
 	};
 	
+	// Draws the bubble as an ellipse
 	this.draw = function() {
 		push();
     strokeWeight(0);
+		// Bubble is made slightly transparent to allow for overlap of bubbles
 		var transparent = color(this.colour);
 		transparent.setAlpha(200);
     fill(transparent);

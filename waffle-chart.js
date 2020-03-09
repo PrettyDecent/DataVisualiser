@@ -35,60 +35,71 @@ function WaffleChart() {
 
   this.setup = function() {
     
+    // Load the current source to display
     this.source = this.sources[this.sourceIndex];
     
+    // Error check to see that source is loaded
     if (!this.source.loaded) {
       console.log('Data not yet loaded');
       return;
     }
     
+    // Get the total number of rows
     this.total = this.source.data.getRowCount();
     
+    // Sets a limit on the slider, more than 8 waffles per row is unreadable
+    var sliderLim = 8;
+    if (this.total < sliderLim) {
+      // If the total is less than the limit, set the limit to the toal
+      sliderLim = this.total;
+    }
+    
+    // Create the slider, set its starting point to be the middle of the max and min values
     this.rowSlider = createSlider(1,
-                                  this.total,
+                                  sliderLim,
                                   Math.round(this.total/2),
                                   1);
     this.rowSlider.position(100, 100);
     
-    // Used to scale the width of each bar
-    /*
-    this.barSum = 0;
-    for (var p = 0; p < this.barWidths.length; p++) {
-      this.barSum += this.barWidths[p];
-    }
-    */
+    // yMod is the amount of y position of the waffles is modified by
+    // Used to implement the scrolling feature
+    this.yMod = 0;
   };
   
+  // Removes the slider when visual is deselected
   this.destroy = function() {
     this.rowSlider.remove();
   };
 
   this.draw = function() {
-    // Draw the title above the plot.
+    
+    // Draws title to screen
     this.drawTitle();
     
+    // Creates an array to store the waffles
     var waffles = [];
     var total = this.total;
     
     var sliderVal = this.rowSlider.value();
     
+    // Calculates the amount of waffles the can be displayed in rows of the same length
+    // And calculates how many additional waffles must be drawn
     var mod = total % sliderVal;
 		var per = total - mod;
-    
-    /*
-    fill(255, 0, 0);
-    ellipse(this.layout.leftMargin, 200, 10);
-    ellipse(this.layout.rightMargin, 200, 10);
-    */
 		
+    // Calculates the size of the waffles relative to the amount in each row
     var waffleDim = this.layout.plotWidth / (sliderVal + ((sliderVal-1) / 2));
     var xAlign = this.layout.leftMargin;
 		var waffleX;
+    
+    // Sets the starting y value to draw from
     var waffleY = this.layout.topMargin;
     
-    // Investigate Y coordinate options
+    // Prevent overflow when one waffle is displayed
     if (waffleDim + (this.layout.marginSize) + this.layout.labelPad > height) {
+      // Restricts the maximum waffle size to be less than the height of the window
       waffleDim = height - ((this.layout.marginSize*2) + (this.layout.labelPad*2));
+      // Moves the waffle to the middle so that it isn't off to one side
       xAlign = (width / 2) - (waffleDim / 2);
 		}
     
@@ -101,7 +112,7 @@ function WaffleChart() {
                               this.source.data.get(waffles.length, 0),
                               this.source.data.get(waffles.length, 1),
                               waffleX,
-                              waffleY,
+                              waffleY + this.yMod,
                               waffleDim,
                               this.layout));
           waffleX += waffleDim * 1.5;
@@ -112,23 +123,42 @@ function WaffleChart() {
     
 		// Draws additional row
     waffleX = xAlign;
+    var addRow = 0;
 		for (var z = 0; z < mod; z++) {
 			waffles.push(new Waffle(color(0, 0, 255, 180),
                             this.source.data.get(waffles.length, 0),
                             this.source.data.get(waffles.length, 1),
                             waffleX,
-                            waffleY,
+                            waffleY + this.yMod,
                             waffleDim,
                             this.layout));
       waffleX += waffleDim * 1.5;
+      addRow = 1;
 		}
+    
+    // Draws all the waffles added to the array
     for (var w = 0; w < total; w++) {
       waffles[w].draw();
     }
+    
+    // Detects current waffle dimensions means they flow off the bottom of the screen
+    if (((per / sliderVal) + addRow) * (waffleDim * 1.5) > height) {
+      // Detects users key press to allow them to scroll up and down
+      if (keyIsDown(DOWN_ARROW)) {
+        this.yMod -= 4;
+      } else if (keyIsDown(UP_ARROW)) {
+        this.yMod += 4;
+      }
+      // Constrains yMod so the user cannot scroll off the screen
+      this.yMod = constrain(this.yMod, -((((per / sliderVal) + addRow) - 1) * (waffleDim * 1.5)), 0);
+    }
+    
+    // Update the values of the location dependent variables
     this.layout.posUpdate();
   };
   
-  this.drawTitle = function() {
+  // Taken from existing line graph code
+  this.drawTitle = function() { 
     push();
     fill(0);
     noStroke();

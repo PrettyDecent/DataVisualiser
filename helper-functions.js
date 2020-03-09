@@ -39,8 +39,13 @@ function stringsToNumbers(array) {
   return array.map(Number);
 }
 
+// Added function
+// Rounds values to the nearest multiple of another value
+// Can round up or down
 function toNearestMult(value, mult, down) {
+  // Makes value an integer
   round = Math.floor(value);
+  // Reduces / Increases value until it is a multiple of the specified mult
   if (down) {
     while (round % mult != 0) {
       round--;
@@ -50,6 +55,7 @@ function toNearestMult(value, mult, down) {
       round++;
     }
   }
+  // Returns modified value
   return round;
 }
 
@@ -66,62 +72,82 @@ function createRange(value) {
   return range;
 }
 
+// Added function
+// Reads the header of a column and detects if units are specified within brackets
 function getUnits(header) {
+  // Runs through all chars in the header
   for (var x = 0; x < header.length; x++) {
     if (header.charAt(x-1) == "(") {
       var units = "";
+      // Once opening bracket is detected it starts adding values to the units var
       do
       {
         units = units + header.charAt(x);
         x++;
       } while (header.charAt(x) != ")");
+      // Returns units once closing bracket is detected
       return units;
     }
   }
   return "";
 }
 
+// Added function
+// Checks if data is int returns boolean value
 function dataIsInt(source) {
   var item = parseInt(source);
   return !isNaN(item);
 }
 
+// Added function
+// Constrains a specified string of text to a certain width
+// Used to ensure that text does not overlap and is still readable
 function drawConstrainedLabel(label, xLoc, yLoc, objWidth, lineMax) {
+  // Capitilises the first letter of every word
 	var labelTitle = makeTitle(label);
-  //lineMax = 36;
 		
 	// Break the title into an array of words
 	var words = [];
 	var word = "";
 	for (var x = 0; x < labelTitle.length; x++) {
+    //If the char is not a space it is added to the current word
 		if (labelTitle.charAt(x) != " ") {
 			word += labelTitle.charAt(x);
 		} else {
+      // When a space is detected the current word is completed,
+      // added to the words array and new word is started
 			words.push(word);
 			word = "";
 		}
 	}
+  // Adds the last word to the array
 	words.push(word);
 	
-	// Construct the longest possible line
+	// A similar approach for constructing the lines
 	var lines = [];
 	var line = "";
-  textSize(18);
   
+  // The textSize is set so textWidth() can accurately return the width of the string
+  push();
+  textSize(18);
 	for (var y = 0; y < words.length; y++) {
+    // If the word can be added without exceeding the width limit it is added to the current line
 		if (textWidth(line) + textWidth(words[y]) + 1 < objWidth) {
 			line += words[y] + " ";
 		} else {
-      // Then break and start a new line
+      // If not, the current line is ended and a new one is started
 			if (line != "") {
 				lines.push(line.slice(0, line.length-1));
 			}
+      // The word that failed the check is the first in the new lne
 			line = words[y] + " ";
 		}
 	}
+  // Adds the last line to the array
 	lines.push(line.slice(0, line.length-1));
+  pop();
   
-  // If lines are too deep, remove lines and add ellipses
+  // If lines are too deep, (i.e: They overlap with text below them) remove lines and add ellipses
   if (lines.length * 18 > lineMax) {
     while (lines.length * 18 > lineMax) {
       lines.pop();
@@ -132,6 +158,7 @@ function drawConstrainedLabel(label, xLoc, yLoc, objWidth, lineMax) {
 	// Draw all lines to screen
 	for (var z = 0; z < lines.length; z++) {
 		push();
+      strokeWeight(0);
 			textAlign('center', 'center');
 			fill(0);
 			textSize(18);
@@ -183,12 +210,16 @@ function drawAxisLabels(xLabel, yLabel, layout) {
   pop();
 }
 
+// Added function
+// Modifies the leftMargin property so that labels on the y-axis can fit within the graph
 function setLeftMargin(layout, text) {
   if (layout.leftMargin < textWidth(text) + layout.labelPad + 20) {
     layout.leftMargin = textWidth(text) + layout.labelPad + 20;
   }
-};
+}
 
+// Modified function
+// Takes the labels and sets a new leftMargin based on their width
 function drawYAxisTickLabels(min, max, layout, mapFunction, decimalPlaces) {
   // Map function must be passed with .bind(this).
   var range = max - min;
@@ -203,7 +234,6 @@ function drawYAxisTickLabels(min, max, layout, mapFunction, decimalPlaces) {
   for (i = 0; i <= layout.numYTickLabels; i++) {
     var value = min + (i * yTickStep);
     var y = mapFunction(value);
-    
     
     //Sets the margin width based on the text width
     if (!setMargin) {
@@ -250,19 +280,17 @@ function drawXAxisTickLabel(value, layout, mapFunction) {
   }
 }
 
-function setBottomMargin(yLocation, layout) {
-  if (layout.bottomMargin < (layout.bottomMargin + (yLocation - layout.bottomMargin))) {
-    layout.bottomMargin -= (yLocation - layout.bottomMargin);
-  }
-}
-
 // --------------------------------------------------------------------
 // Plotting visual/UI functions
 // --------------------------------------------------------------------
 
+// Added function
+// Capitalises the first letter of every word
 function makeTitle(text) {
   var title = text;
+  // The first letter is capitalised
   title = title.charAt(0).toUpperCase() + title.substring(1);
+  // Every other letter is capitalised by detecting a space before that letter
   for (var x = 3; x < title.length; x++) {
     if (title.charAt(x) == " ") {
       title = title.substring(0, x+1) + title.charAt(x+1).toUpperCase() + title.substring(x+2);
@@ -271,6 +299,10 @@ function makeTitle(text) {
   return title;
 }
 
+
+// Added function
+// To meet the requirement of colours for display in the bubble chart and pie chart
+// A dictionary of a colour hexes so that a variety of colour is displayed
 function colourGen(n) {
   var allColours = {
     red: "#ff0000",
@@ -318,6 +350,7 @@ function colourGen(n) {
   };
   var keys = Object.keys(allColours);
 
+  // Returns an array of these colours of a length specified in the function call
   var someColours = [];
   for (var x = 0; x < n; x++) {
     someColours.push(allColours[keys[x]]);

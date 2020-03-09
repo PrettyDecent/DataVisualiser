@@ -4,12 +4,7 @@ function DataSource(id, name, location, units) {
 	this.location = location;
 	this.loaded = false;
 	
-	if (units == undefined) {
-		this.units = "";
-	} else {
-		this.units = units;
-	}
-	
+	// Error alert function
 	this.errorAlert = function(error) {
 		alert(error);
 		return;
@@ -38,5 +33,6 @@ function DataSource(id, name, location, units) {
 		);
 	};
 	
+	// Function is called on instantiation of object
 	this.loadToTable();
 }

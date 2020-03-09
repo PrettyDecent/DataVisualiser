@@ -134,9 +134,12 @@ function PieChart() {
     text(makeTitle(label), x + boxWidth + 10, y + boxWidth / 2);
   };
   
+  // Added function
+  // The select object within p5.js behaves a bit strangely
+  // So this function detects resizing and moves it to always be centered above the piechart
   this.resizeEvent = function() {
     // Position the select DOM element
-    this.select.position(width * 0.5, this.layout.labelSpace * 5.2);//(height * 0.1) + this.layout.labelSpace);
+    this.select.position(width * 0.5, this.layout.labelSpace * 5.2);
     this.select.center('horizontal');
   };
 }

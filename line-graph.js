@@ -110,6 +110,7 @@ function LineGraph() {
       previous = current;
     }
     
+    // Update the values of the location dependent variables
     this.layout.posUpdate();
   };
 

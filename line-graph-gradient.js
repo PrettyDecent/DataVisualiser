@@ -130,7 +130,7 @@ function LineGraphGradient() {
 
     // Loop over all rows but only plot those in range.
     for (var i = 0; i < this.source.data.getRowCount(); i++) {
-
+      push();
       // Create an object to store data for the current year.
       var current = {
         // Convert strings to numbers.
@@ -175,6 +175,7 @@ function LineGraphGradient() {
         }
 
         yearCount++;
+        pop();
       }
 
       // Stop drawing this frame when the number of years drawn is
@@ -200,6 +201,7 @@ function LineGraphGradient() {
       //noLoop();
     }
     
+    // Update the values of the location dependent variables
     this.layout.posUpdate();
   };
 

@@ -10,12 +10,15 @@ function HistBar(colour, label, x, y, w, h, layout) {
 	
 	this.draw = function() {
 		
-		drawConstrainedLabel(this.label, this.x, this.layout.bottomMargin + (this.layout.marginSize / 2), this.w);  
+		// Label is constrained to prevent overlap
+		drawConstrainedLabel(this.label, this.x, this.layout.bottomMargin + (this.layout.marginSize / 2), this.w, layout.labelPad*2);  
 			
+		// Calculation of bar is done externally
+		// Bar is drawn as rect with specified colour
 		push();
 		fill(this.colour);
 		stroke(0);
-		strokeWeight(0.5);
+		strokeWeight(1);
 		rectMode(CORNER);
 		rect(this.x, this.y, this.w, this.h);
 		pop();	

@@ -8,11 +8,13 @@ function Menu(menuId) {
 	this.childMenu = null;
 	var self = this;
 	
+	// Parents a specified menu to another menu
 	this.addSubMenu = function(childMenu) {
 		this.childMenu = childMenu;
 		childMenu.parentMenu = this;
 	};
 	
+	// Applied to the buttons within the drop-downs
 	this.selectItem = function(id){
     var index = this.findIndex(id);
     
@@ -28,7 +30,7 @@ function Menu(menuId) {
 			// Load sources into menu, loads visual
 			if (this.childMenu != null) {
         this.childMenu.items = this.items[index].sources;
-				this.selected.sourceIndex = 0;
+				this.selected.sourceIndex = 0; //this.childMenu.selected;
 				this.childMenu.loadMenu();
 				this.selected.setup();
       }
@@ -47,9 +49,9 @@ function Menu(menuId) {
     }
   };
 	
+	// Moved from each visualisation and is called when each source is instantiated
 	this.preLoad = function(){
 		var index = this.findIndex(id);
-    
 		if (this.items[index].hasOwnProperty('preload')) {
 				this.items[index].preload();
 			}
@@ -62,7 +64,6 @@ function Menu(menuId) {
         return i;
       }
     }
-
     // Visualisation not found.
     return null;
   };
@@ -88,6 +89,10 @@ function Menu(menuId) {
 		var domDropdown = select(this.menuId).child();
 		var domMenu = select("#" + domDropdown[3].id);
 		var menuItems = domMenu.child();
+		
+		// Once a visual has been chosen
+		// Make the sources menu appear so a different source can be chosen
+		select(this.menuId).style('display', 'inline-block');
 		
 		// Clear menu.
 		for (x = menuItems.length-1; x > 0; x--) {

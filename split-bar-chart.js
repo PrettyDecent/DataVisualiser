@@ -40,9 +40,10 @@ function SplitBarChart() {
 
   this.setup = function() {
     
-    // Sets the current source to be displayed
+    // Load the current source to display
     this.source = this.sources[this.sourceIndex];
     
+    // Error check to see that source is loaded
     if (!this.source.loaded) {
       console.log('Data not yet loaded');
       return;

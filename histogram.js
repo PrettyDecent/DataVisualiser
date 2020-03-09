@@ -34,8 +34,10 @@ function Histogram() {
 
   this.setup = function() {
     
+    // Load the current source to display
     this.source = this.sources[this.sourceIndex];
     
+    // Error check to see that source is loaded
     if (!this.source.loaded) {
       console.log('Data not yet loaded');
       return;
@@ -102,6 +104,7 @@ function Histogram() {
     var bars = [];
     for (var i = 0; i < this.source.data.getRowCount(); i++) {
       
+      // Calculate the location of the bar by adding the previous bars xLocation and Width values
       var barX; 
       if (i < 1) {
         barX = this.layout.leftMargin;
@@ -109,6 +112,7 @@ function Histogram() {
         barX = bars[i-1].x + bars[i-1].w;
       }
       
+      // Push new bar to the array
       bars.push(new HistBar(color(0, 0, 255, 180),
                             this.source.data.get(i, 0),
                             barX,
@@ -116,9 +120,11 @@ function Histogram() {
                             this.layout.plotWidth * (this.barWidths[i] / this.barSum),
                             this.layout.bottomMargin - this.mapYValueToHeight(this.freqDensities[i]),
                             this.layout));
-
+      
+      // Draw the new bar just after it is added
       bars[i].draw();
     }
+    // Update the values of the location dependept variables
     this.layout.posUpdate();
   };
 
@@ -129,11 +135,14 @@ function Histogram() {
     var rRange = "0";
     var hyphen = false;
     for (var x = 0; x < source.length; x++) {
+      // Runs through range looking for a hyphen
       if (source.charAt(x) == "-") {
+        // If the hyphen is found then subsequent values are added to rRange
         hyphen = true;
         rRange = "";
       }
       else {
+        // Determines which range to added the chars to 
         if (!hyphen) {
           lRange += source.charAt(x);
         } else {
@@ -141,11 +150,14 @@ function Histogram() {
         } 
       }
     }
+    // Calculates the difference between the two ranges
+    // If there is no range the original value is returned
     var range = abs(parseFloat(lRange) - parseFloat(rRange));
     // Return value to 2dp
     return Math.round( range * 100) / 100;
   };
   
+  // Copied from line-graph code
   this.drawTitle = function() {
     push();
     fill(0);
@@ -158,6 +170,7 @@ function Histogram() {
     pop();
   };
 
+  // Copied from line-graph code
   this.mapXValueToWidth = function(value, xAxisStart, xAxisEnd) {
     return map(value,
                xAxisStart,
